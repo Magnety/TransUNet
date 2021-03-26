@@ -50,7 +50,7 @@ class PreActBottleneck(nn.Module):
         self.conv2 = conv3x3(cmid, cmid, stride, bias=False)  # Original code has it on conv1!!
         self.gn3 = nn.GroupNorm(32, cout, eps=1e-6)
         self.conv3 = conv1x1(cmid, cout, bias=False)
-        self.relu = nn.ReLU(inplace=True)
+        self.relu = nn.LeakyReLU()
 
         if (stride != 1 or cin != cout):
             # Projection also with pre-activation according to paper.
@@ -141,16 +141,16 @@ class ResNetV2(nn.Module):
 
     def forward(self, x):
         features = []
-        print("tag2_1",x.size())
+        #print("tag2_1",x.size())
         #b, c, in_size, _ = x.size()
         x = self.root(x)
-        print("tag2_2", x.size())
+        #print("tag2_2", x.size())
         features.append(x)
         x = nn.MaxPool3d(kernel_size=2, stride=2, padding=0)(x)
-        print("tag2_2_1", x.size())
+        #print("tag2_2_1", x.size())
         for i in range(len(self.body)-1):
             x = self.body[i](x)
-            print("tag2_3", x.size())
+            #print("tag2_3", x.size())
             """right_size = int(in_size / 4 / (i+1))
             if x.size()[2] != right_size:
                 pad = right_size - x.size()[2]
@@ -161,7 +161,7 @@ class ResNetV2(nn.Module):
                 feat = x"""
             features.append(x)
         x = self.body[-1](x)
-        print("tag2_4", x.size())
+        #print("tag2_4", x.size())
 
         #features.append(x)
         return x, features[::-1]

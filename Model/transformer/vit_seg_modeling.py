@@ -43,7 +43,7 @@ def swish(x):
     return x * torch.sigmoid(x)
 
 
-ACT2FN = {"gelu": torch.nn.functional.gelu, "relu": torch.nn.functional.relu, "swish": swish}
+ACT2FN = {"gelu": torch.nn.functional.gelu, "relu": torch.nn.functional.leaky_relu, "swish": swish}
 
 
 class Attention(nn.Module):
@@ -156,20 +156,20 @@ class Embeddings(nn.Module):
 
 
     def forward(self, x):
-        print("tag1_3", x.size())
+        #print("tag1_3", x.size())
         if self.hybrid:
             x, features = self.hybrid_model(x)
         else:
             features = None
         x = self.patch_embeddings(x)  # (B, hidden. n_patches^(1/2), n_patches^(1/2))
-        print("tag1_4", x.size())
+        #print("tag1_4", x.size())
         x = x.flatten(2)
-        print("tag1_5", x.size())
+        #print("tag1_5", x.size())
         x = x.transpose(-1, -2)  # (B, n_patches, hidden)
 
         embeddings = x + self.position_embeddings
         embeddings = self.dropout(embeddings)
-        print("tag1_6", embeddings.size())
+        #print("tag1_6", embeddings.size())
         return embeddings, features
 
 
@@ -282,7 +282,7 @@ class Conv3dReLU(nn.Sequential):
             padding=padding,
             bias=not (use_batchnorm),
         )
-        relu = nn.ReLU(inplace=True)
+        relu = nn.LeakyReLU()
 
         bn = nn.BatchNorm3d(out_channels)
 
@@ -360,24 +360,24 @@ class DecoderCup(nn.Module):
         self.blocks = nn.ModuleList(blocks)
 
     def forward(self, hidden_states, features=None):
-        print("tag2",hidden_states.size())
+        #print("tag2",hidden_states.size())
         B, n_patch, hidden = hidden_states.size()  # reshape from (B, n_patch, hidden) to (B, h, w, hidden)
         h, w ,l = 4,16,16
         x = hidden_states.permute(0, 2, 1)
         x = x.contiguous().view(B, hidden, h, w ,l)
-        print("tag1_7",x.size())
+        #print("tag1_7",x.size())
         x = self.conv_more(x)
-        print("tag1_8",x.size())
-        for i in range(self.config.n_skip):
-            print("tag1_8__", features[i].size())
+        #print("tag1_8",x.size())
+        #for i in range(self.config.n_skip):
+            #print("tag1_8__", features[i].size())
         for i, decoder_block in enumerate(self.blocks):
             if features is not None:
                 skip = features[i] if (i < self.config.n_skip) else None
             else:
                 skip = None
             x = decoder_block(x, skip=skip)
-            print("tag3", x.size())
-        print("tag4", x.size())
+            #print("tag3", x.size())
+        #print("tag4", x.size())
         return x
 
 
@@ -420,17 +420,17 @@ class VisionTransformer(nn.Module):
         self.config = config
 
     def forward(self, x):
-        print("tag1_1",x.size())
+        #print("tag1_1",x.size())
         if x.size()[1] == 1:
             x = x.repeat(1,3,1,1,1)
-        print("tag1_2", x.size())
+        #print("tag1_2", x.size())
 
         x, attn_weights, features = self.transformer(x)  # (B, n_patch, hidden)
-        print("tag1_6", x.size())
+        #print("tag1_6", x.size())
         x = self.decoder(x, features)
-        print("tag5", x.size())
+        #print("tag5", x.size())
         logits = self.segmentation_head(x)
-        print("tag7", x.size())
+        #print("tag7", x.size())
 
         return logits
 

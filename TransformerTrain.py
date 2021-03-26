@@ -209,13 +209,13 @@ def train(k, net, train_loader, val_loader, optimizer, criterion_bce, criterion_
 os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 device_ids = [0]
 train_list = get_data_list("/home/ubuntu/liuyiyao/3D_breast_Seg/Dataset/miccai_data_64*256*256_patch", ratio=0.8)
-train_log = './Transformer_0325/train/trainLog.txt'
-val_seg_log = './Transformer_0325/valid/valsegLog.txt'
-val_cls_log = './Transformer_0325/valid/valclsLog.txt'
-val_path = './Transformer_0325/valid'
-train_path = './Transformer_0325/train'
-check_point = './Transformer_0325/checkpoints'
-tensorboard_dir = './Transformer_0325/tensorboard_log'
+train_log = './Transformer_0326/train/trainLog.txt'
+val_seg_log = './Transformer_0326/valid/valsegLog.txt'
+val_cls_log = './Transformer_0326/valid/valclsLog.txt'
+val_path = './Transformer_0326/valid'
+train_path = './Transformer_0326/train'
+check_point = './Transformer_0326/checkpoints'
+tensorboard_dir = './Transformer_0326/tensorboard_log'
 
 if not os.path.exists(check_point):
     os.makedirs(check_point)
@@ -225,11 +225,11 @@ if not os.path.exists(train_path):
     os.makedirs(train_path)
 if not os.path.exists(tensorboard_dir):
     os.makedirs(tensorboard_dir)
-information_line = '=' * 20 + ' Transformer_0325-TRAIN ' + '=' * 20 + '\n'
+information_line = '=' * 20 + ' Transformer_0326-TRAIN ' + '=' * 20 + '\n'
 open(train_log, 'w').write(information_line)
-information_line = '=' * 20 + ' Transformer_0325-VAL-SEG ' + '=' * 20 + '\n'
+information_line = '=' * 20 + ' Transformer_0326-VAL-SEG ' + '=' * 20 + '\n'
 open(val_seg_log, 'w').write(information_line)
-information_line = '=' * 20 + ' Transformer_0325-VAL-CLS ' + '=' * 20 + '\n'
+information_line = '=' * 20 + ' Transformer_0326-VAL-CLS ' + '=' * 20 + '\n'
 open(val_cls_log, 'w').write(information_line)
 K = 5
 k_fold(K, train_list, train_log,val_seg_log, val_cls_log, val_path,train_path,tensorboard_dir)
